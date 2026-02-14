@@ -1,59 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>My Valentine ❤️</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Will You Be My Valentine?</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #ffafbd, #ffc3a0);
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        /* Floating Hearts Background */
+        .heart {
+            position: absolute;
+            color: rgba(255, 105, 180, 0.4);
+            font-size: 20px;
+            animation: float 6s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            z-index: 10;
+            max-width: 90%;
+        }
+
+        h1 { color: #d63384; margin-bottom: 20px; }
+        
+        .btn-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        #yesBtn { background-color: #ff4d6d; color: white; }
+        #noBtn { background-color: #fb6f92; color: white; }
+
+        .hidden { display: none; }
+
+        /* Slideshow Styles */
+        .slideshow-container {
+            max-width: 300px;
+            margin: auto;
+        }
+        .slides { width: 100%; border-radius: 10px; display: none; }
+    </style>
 </head>
 <body>
 
-<iframe id="music" width="0" height="0"
-src="https://www.youtube.com/embed/LV_wiOhO40Q?enablejsapi=1"
-frameborder="0" allow="autoplay"></iframe>
+    <div id="page1" class="container">
+        <h1 id="mainQuestion">Will you be my Valentine? ❤️</h1>
+        <div class="btn-container">
+            <button id="yesBtn" onclick="showQuote()">Yes 💕</button>
+            <button id="noBtn" onclick="handleNo()">No 🙄</button>
+        </div>
+    </div>
 
-<div class="container" id="page1">
-  <h1>Will you be my Valentine? 💖</h1>
-  <div class="buttons">
-    <button onclick="yesClicked()">Yes 💕</button>
-    <button onclick="noClicked()">No 🙄</button>
-  </div>
-</div>
+    <div id="page2" class="container hidden">
+        <h1>For You...</h1>
+        <p id="quoteText">"Your quote goes here - rewrite this in the code!"</p>
+        <button id="yesBtn" onclick="showDate()">Next ➔</button>
+    </div>
 
-<div class="container hidden" id="page2">
-  <p class="quote">
-Pyaar shayad woh nahi jo roz “I love you” kehne se hota hai<br><br>
-Pyaar toh woh hai jo khamoshi mein bhi ek dusre ko chhodne nahi deta<br><br>
-Tum meri zindagi ka sabse pyaara ehsaas ho jise mera dil lafzon se zyada samajhta hai 💗
-  </p>
-  <button onclick="goToDate()">Next ➡️</button>
-</div>
+    <div id="pageSlideshow" class="container hidden">
+        <h1>Look at us! ✨</h1>
+        <div class="slideshow-container">
+            <img src="image1.jpg" class="slides">
+            <img src="image2.jpg" class="slides">
+            <img src="image3.jpg" class="slides">
+        </div>
+        <p>So... Will you be my valentine? 😉</p>
+        <button id="yesBtn" onclick="showDate()">Of course YES! 💕</button>
+    </div>
 
-<div class="container hidden" id="pageSlideshow">
-  <h1>Us 💕</h1>
-  <div class="slideshow">
-    <img id="slide" src="photos/photo1.jpg" class="fade-zoom"/>
-  </div>
-  <h2>Will you be my Valentine? 💖</h2>
-  <button onclick="goToDate()">Of course yes 😌</button>
-</div>
+    <div id="pageFinal" class="container hidden">
+        <h1>It's a Date! 🥂</h1>
+        <p>See you at [Your Time] at [Your Place]</p>
+        <p>Today is going to be special!</p>
+    </div>
 
-<div class="container hidden" id="page3">
-  <h1>Our Date 💖</h1>
-  <p>14th February 2026</p>
-  <p>At 5:30 PM</p>
-  <button onclick="goToFinal()">One last thing 💌</button>
-</div>
+    <script>
+        // 1. Create Floating Hearts
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerHTML = '❤️';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = Math.random() * 3 + 3 + 's';
+            document.body.appendChild(heart);
+            setTimeout(() => { heart.remove(); }, 6000);
+        }
+        setInterval(createHeart, 300);
 
-<div class="container hidden" id="pageFinal">
-  <h1>For You 💖</h1>
-  <p class="final-message">
-    No matter where life takes us<br>
-    this moment will always stay with me<br><br>
-    Thank you for choosing us<br>
-    and for being exactly who you are 💕
-  </p>
-</div>
+        // 2. Logic for Buttons
+        let noCount = 0;
+        function handleNo() {
+            if (noCount === 0) {
+                alert("Seriouslyy?? 🤨");
+                const noBtn = document.getElementById('noBtn');
+                noBtn.innerHTML = "Ofc Yes! 😍";
+                noBtn.style.backgroundColor = "#ff4d6d";
+                noCount++;
+            } else {
+                showSlideshow();
+            }
+        }
 
-<script src="script.js"></script>
+        function showQuote() {
+            document.getElementById('page1').classList.add('hidden');
+            document.getElementById('page2').classList.remove('hidden');
+        }
+
+        function showSlideshow() {
+            document.getElementById('page1').classList.add('hidden');
+            document.getElementById('pageSlideshow').classList.remove('hidden');
+            startSlideshow();
+        }
+
+        function showDate() {
+            document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
+            document.getElementById('pageFinal').classList.remove('hidden');
+        }
+
+        // 3. Slideshow Logic
+        let slideIndex = 0;
+        function startSlideshow() {
+            let slides = document.getElementsByClassName("slides");
+            for (let i = 0; i < slides.length; i++) {
+                slides[i].style.display = "none";  
+            }
+            slideIndex++;
+            if (slideIndex > slides.length) {slideIndex = 1}    
+            slides[slideIndex-1].style.display = "block";  
+            setTimeout(startSlideshow, 2000); // Change image every 2 seconds
+        }
+    </script>
 </body>
 </html>
