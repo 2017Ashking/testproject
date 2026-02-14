@@ -21,10 +21,11 @@
         /* Floating Hearts Background */
         .heart {
             position: absolute;
-            color: rgba(255, 105, 180, 0.4);
+            color: rgba(255, 105, 180, 0.5);
             font-size: 20px;
             animation: float 6s linear infinite;
             z-index: 0;
+            pointer-events: none;
         }
 
         @keyframes float {
@@ -33,58 +34,67 @@
         }
 
         .container {
-            background: rgba(255, 255, 255, 0.8);
-            padding: 2rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.85);
+            padding: 2.5rem;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             z-index: 10;
-            max-width: 90%;
+            width: 350px;
+            border: 2px solid #ff4d6d;
+            position: relative;
         }
 
-        h1 { color: #d63384; margin-bottom: 20px; }
+        h1 { color: #d63384; margin-bottom: 20px; font-size: 1.8rem; }
+        p { color: #555; line-height: 1.5; font-size: 1.1rem; }
         
         .btn-container {
             display: flex;
-            gap: 20px;
+            gap: 15px;
             justify-content: center;
-            margin-top: 20px;
+            margin-top: 25px;
+            height: 50px; /* Maintain space */
         }
 
         button {
-            padding: 12px 25px;
-            font-size: 1.2rem;
+            padding: 12px 28px;
+            font-size: 1.1rem;
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: transform 0.2s ease;
+            font-weight: bold;
         }
 
-        #yesBtn { background-color: #ff4d6d; color: white; }
-        #noBtn { background-color: #fb6f92; color: white; }
+        #yesBtn { background-color: #ff4d6d; color: white; z-index: 11; }
+        #yesBtn:hover { transform: scale(1.1); }
+
+        #noBtn { 
+            background-color: #fb6f92; 
+            color: white; 
+            position: absolute; 
+            transition: all 0.2s ease;
+        }
 
         .hidden { display: none; }
-
-        /* Slideshow Styles */
-        .slideshow-container {
-            max-width: 300px;
-            margin: auto;
-        }
-        .slides { width: 100%; border-radius: 10px; display: none; }
     </style>
 </head>
 <body>
 
+    <audio id="bgMusic" loop>
+        <source src="https://www.youtube.com/watch?v=8pmcxUUARzM&list=RD8pmcxUUARzM&start_radio=1" type="audio/mpeg">
+    </audio>
+
     <div id="page1" class="container">
-        <h1 id="mainQuestion">Will you be my Valentine? ❤️</h1>
+        <h1>Will you be my Valentine? ❤️</h1>
         <div class="btn-container">
-            <button id="yesBtn" onclick="showQuote()">Yes 💕</button>
-            <button id="noBtn" onclick="handleNo()">No 🙄</button>
+            <button id="yesBtn" onclick="handleYes()">Yes 💕</button>
+            <button id="noBtn" onmouseover="moveButton()" onclick="handleNoClick()">No 🙄</button>
         </div>
     </div>
 
     <div id="page2" class="container hidden">
-        <h1>For You...</h1>
-        <p id="quoteText">""Pyaar shayad woh nahi, jo roz "I love you" kehne se hota h, pyaar toh woh h, jo khamoshi mein bhi, ek dusre ko chhodne nahi deta..
+        <h1>For You... ✨</h1>
+        <p>""Pyaar shayad woh nahi, jo roz "I love you" kehne se hota h, pyaar toh woh h, jo khamoshi mein bhi, ek dusre ko chhodne nahi deta..
 
 "Pyaar shayad woh nahi, jo hum duniya ko dikhate hain, pyaar toh woh h, jo hum chup kar, ek dusre ke liye mehsoos karte hain..
 
@@ -103,28 +113,25 @@
 "Aur agar zindagi ne poocha ki sabse khoobsurat cheez kya thi, toh main bina soche kahunga -tum, aur tumhaare saath bitae hue mere vo pal, jise mein caha kar bhi nahi bhool sakta..
 
 "Aur aaj ke din main tumhe paane ka wada nahi karta, main bas itna kehna chahta hoon -tum meri zindagi ki sabse pyara ehsaas ho, jise lafzon se zyada mera dil samjhta h.."</p>
-        <button id="yesBtn" onclick="showDate()">Next ➔</button>
-    </div>
-
-    <div id="pageSlideshow" class="container hidden">
-        <h1>Look at us! ✨</h1>
-        <div class="slideshow-container">
-            <img src="WhatsApp Image 2026-02-14 at 12.23.27 PM" class="slides">
-            <img src="WhatsApp Image 2026-02-14 at 12.23.21 PM" class="slides">
-            <img src="WhatsApp Image 2026-02-14 at 12.23.17 PM (1)" class="slides">
-        </div>
-        <p>So... Will you be my valentine? 😉</p>
-        <button id="yesBtn" onclick="showDate()">Of course YES! 💕</button>
+        <button id="yesBtn" style="margin-top: 20px;" onclick="showFinal()">Next ➔</button>
     </div>
 
     <div id="pageFinal" class="container hidden">
-        <h1>It's a Date!</h1>
-        <p>See you at 5:30PM </p>
-        <p>I love you!</p>
+        <h1>It's a Date! 🥂</h1>
+        <p><strong>Time:</strong> [Time]</p>
+        <p><strong>Place:</strong> [Location]</p>
+        <p>I can't wait! 😍</p>
     </div>
 
     <script>
-        // 1. Create Floating Hearts
+        const music = document.getElementById('bgMusic');
+        const noBtn = document.getElementById('noBtn');
+
+        function playMusic() {
+            music.play().catch(() => {});
+        }
+
+        // 1. Floating Hearts Background
         function createHeart() {
             const heart = document.createElement('div');
             heart.classList.add('heart');
@@ -134,49 +141,39 @@
             document.body.appendChild(heart);
             setTimeout(() => { heart.remove(); }, 6000);
         }
-        setInterval(createHeart, 300);
+        setInterval(createHeart, 400);
 
-        // 2. Logic for Buttons
-        let noCount = 0;
-        function handleNo() {
-            if (noCount === 0) {
-                alert("Seriouslyy?? 🤨");
-                const noBtn = document.getElementById('noBtn');
-                noBtn.innerHTML = "Ofc Yes! 😍";
-                noBtn.style.backgroundColor = "#ff4d6d";
-                noCount++;
-            } else {
-                showSlideshow();
-            }
+        // 2. The Runaway "No" Button Logic
+        function moveButton() {
+            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
+            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
+            
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = `${x}px`;
+            noBtn.style.top = `${y}px`;
         }
 
-        function showQuote() {
+        // 3. Navigation Logic
+        function handleYes() {
+            playMusic();
             document.getElementById('page1').classList.add('hidden');
             document.getElementById('page2').classList.remove('hidden');
         }
 
-        function showSlideshow() {
-            document.getElementById('page1').classList.add('hidden');
-            document.getElementById('pageSlideshow').classList.remove('hidden');
-            startSlideshow();
+        // Fallback if they actually manage to click No (or on mobile tap)
+        function handleNoClick() {
+            playMusic();
+            alert("Seriouslyy?? 🤨 No isn't an option!");
+            noBtn.innerHTML = "Ofc Yes! 😍";
+            noBtn.style.position = 'static'; // Put it back in the flow
+            noBtn.onmouseover = null; // Stop it from running away
+            noBtn.onclick = handleYes;
+            noBtn.style.backgroundColor = "#ff4d6d";
         }
 
-        function showDate() {
-            document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
+        function showFinal() {
+            document.getElementById('page2').classList.add('hidden');
             document.getElementById('pageFinal').classList.remove('hidden');
-        }
-
-        // 3. Slideshow Logic
-        let slideIndex = 0;
-        function startSlideshow() {
-            let slides = document.getElementsByClassName("slides");
-            for (let i = 0; i < slides.length; i++) {
-                slides[i].style.display = "none";  
-            }
-            slideIndex++;
-            if (slideIndex > slides.length) {slideIndex = 1}    
-            slides[slideIndex-1].style.display = "block";  
-            setTimeout(startSlideshow, 2000); // Change image every 2 seconds
         }
     </script>
 </body>
